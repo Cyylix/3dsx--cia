@@ -10,6 +10,7 @@
 6. Now wait for the build to finish and download the cia from the given link in the logs
 ---
 ### Credits
+
 bannertool by Epicpkmn11
 cxitool by zoogie
 makerom by 3DSGuy
