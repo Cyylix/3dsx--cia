@@ -17,19 +17,23 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends ca-certificates file jq
+          jq --version
 
       - name: Convert 3DSX to CIA
         run: |
           chmod +x cxitool makerom bannertool
-          if [ ! -f info.json ]; then
-            echo "Error: info.json not found"
-            exit 1
-          fi
+          if [ ! -f info.json ]; then echo "Error: info.json not found"; exit 1; fi
+          echo "info.json contents:"; cat info.json
           TID=$(jq -r '."Title-ID"' info.json)
           CODE=$(jq -r '."Product-Code"' info.json)
           BANNER=$(jq -r '.Banner' info.json)
           INPUT=$(jq -r '.Input' info.json)
           OUTPUT=$(jq -r '.Output' info.json)
+          echo "TID=$TID"
+          echo "CODE=$CODE"
+          echo "BANNER=$BANNER"
+          echo "INPUT=$INPUT"
+          echo "OUTPUT=$OUTPUT"
           if [ "$TID" = "null" ] || [ -z "$TID" ]; then echo "Error: 'Title-ID' missing in info.json"; exit 1; fi
           if [ "$CODE" = "null" ] || [ -z "$CODE" ]; then echo "Error: 'Product-Code' missing in info.json"; exit 1; fi
           if [ "$BANNER" = "null" ] || [ -z "$BANNER" ]; then echo "Error: 'Banner' missing in info.json"; exit 1; fi
