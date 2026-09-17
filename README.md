@@ -11,9 +11,9 @@
 ---
 ### Credits
 
-bannertool by Epicpkmn11
-cxitool by zoogie
-makerom by 3DSGuy
+- bannertool by Epicpkmn11
+- cxitool by zoogie
+- makerom by 3DSGuy
 ---
 ### Contributing
 Create an issue or pull request to contribute
