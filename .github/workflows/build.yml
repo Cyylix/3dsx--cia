@@ -1,0 +1,68 @@
+name: Build CIA
+
+on:
+  push:
+    branches: [ main, master ]
+    tags: [ 'v*' ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  convert:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ca-certificates file jq
+
+      - name: Convert 3DSX to CIA
+        run: |
+          chmod +x cxitool makerom bannertool
+          if [ ! -f info.json ]; then
+            echo "Error: info.json not found"
+            exit 1
+          fi
+          TID=$(jq -r '."Title-ID"' info.json)
+          CODE=$(jq -r '."Product-Code"' info.json)
+          BANNER=$(jq -r '.Banner' info.json)
+          INPUT=$(jq -r '."Input-3dsx"' info.json)
+          OUTPUT=$(jq -r '.Output' info.json)
+          if [ "$TID" = "null" ] || [ "$CODE" = "null" ] || [ "$BANNER" = "null" ] || [ "$INPUT" = "null" ] || [ "$OUTPUT" = "null" ]; then
+            echo "Error: info.json is missing required fields"
+            exit 1
+          fi
+          if [ ! -f "$BANNER" ]; then
+            echo "Error: banner file '$BANNER' not found"
+            exit 1
+          fi
+          if [ ! -f "$INPUT" ]; then
+            echo "Error: 3dsx file '$INPUT' not found"
+            exit 1
+          fi
+          WIDTH=$(file "$BANNER" | grep -oP '\d+(?= x)' | head -1)
+          HEIGHT=$(file "$BANNER" | grep -oP '(?<=x )\d+' | head -1)
+          if [ "$WIDTH" != "256" ] || [ "$HEIGHT" != "128" ]; then
+            echo "Error: banner must be 256x128 pixels, got ${WIDTH}x${HEIGHT}"
+            exit 1
+          fi
+          ./bannertool makebanner -i "$BANNER" -o banner.bnr
+          ./cxitool -b banner.bnr -t "$TID" -c "$CODE" "$INPUT" temp.cxi
+          ./makerom -f cia -o "$OUTPUT" -target t -i temp.cxi:0:0
+          rm -f temp.cxi banner.bnr
+
+      - name: Upload CIA artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cia-build
+          path: ./*.cia
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Attach CIA to Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ./*.cia
