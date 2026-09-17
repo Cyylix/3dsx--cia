@@ -28,7 +28,7 @@ jobs:
           TID=$(jq -r '."Title-ID"' info.json)
           CODE=$(jq -r '."Product-Code"' info.json)
           BANNER=$(jq -r '.Banner' info.json)
-          INPUT=$(jq -r '."Input-3dsx"' info.json)
+          INPUT=$(jq -r '."Input"' info.json)
           OUTPUT=$(jq -r '.Output' info.json)
           if [ "$TID" = "null" ] || [ "$CODE" = "null" ] || [ "$BANNER" = "null" ] || [ "$INPUT" = "null" ] || [ "$OUTPUT" = "null" ]; then
             echo "Error: info.json is missing required fields"
