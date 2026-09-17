@@ -3,5 +3,6 @@
   "Product-Code": "CTR-P-3CIA",
   "Banner": "banner.png",
   "Input": "input.3dsx",
-  "Output": "output.cia"
+  "Output": "output.cia",
+  "Bnr_audio": "audio.wav"
 }
