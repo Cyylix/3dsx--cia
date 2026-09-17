@@ -28,20 +28,15 @@ jobs:
           TID=$(jq -r '."Title-ID"' info.json)
           CODE=$(jq -r '."Product-Code"' info.json)
           BANNER=$(jq -r '.Banner' info.json)
-          INPUT=$(jq -r '."Input"' info.json)
+          INPUT=$(jq -r '.Input' info.json)
           OUTPUT=$(jq -r '.Output' info.json)
-          if [ "$TID" = "null" ] || [ "$CODE" = "null" ] || [ "$BANNER" = "null" ] || [ "$INPUT" = "null" ] || [ "$OUTPUT" = "null" ]; then
-            echo "Error: info.json is missing required fields"
-            exit 1
-          fi
-          if [ ! -f "$BANNER" ]; then
-            echo "Error: banner file '$BANNER' not found"
-            exit 1
-          fi
-          if [ ! -f "$INPUT" ]; then
-            echo "Error: 3dsx file '$INPUT' not found"
-            exit 1
-          fi
+          if [ "$TID" = "null" ] || [ -z "$TID" ]; then echo "Error: 'Title-ID' missing in info.json"; exit 1; fi
+          if [ "$CODE" = "null" ] || [ -z "$CODE" ]; then echo "Error: 'Product-Code' missing in info.json"; exit 1; fi
+          if [ "$BANNER" = "null" ] || [ -z "$BANNER" ]; then echo "Error: 'Banner' missing in info.json"; exit 1; fi
+          if [ "$INPUT" = "null" ] || [ -z "$INPUT" ]; then echo "Error: 'Input' missing in info.json"; exit 1; fi
+          if [ "$OUTPUT" = "null" ] || [ -z "$OUTPUT" ]; then echo "Error: 'Output' missing in info.json"; exit 1; fi
+          if [ ! -f "$BANNER" ]; then echo "Error: banner file '$BANNER' not found"; exit 1; fi
+          if [ ! -f "$INPUT" ]; then echo "Error: input file '$INPUT' not found"; exit 1; fi
           WIDTH=$(file "$BANNER" | grep -oP '\d+(?= x)' | head -1)
           HEIGHT=$(file "$BANNER" | grep -oP '(?<=x )\d+' | head -1)
           if [ "$WIDTH" != "256" ] || [ "$HEIGHT" != "128" ]; then
